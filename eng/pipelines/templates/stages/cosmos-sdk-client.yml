@@ -23,7 +23,7 @@ parameters:
 - name: TargetDocRepoName
   type: string
   default: azure-docs-sdk-python
-  
+
 stages:
   - stage: Build
     jobs:
@@ -38,10 +38,12 @@ stages:
         strategy:
           matrix:
             Windows_Python35:
-              OSVmImage: 'windows-2019'
+              Pool: $(WindowsPool)
+              OSVmImage:
               PythonVersion: '3.5'
             Windows_Python27:
-              OSVmImage: 'windows-2019'
+              Pool: $(WindowsPool)
+              OSVmImage:
               PythonVersion: '2.7'
         pool:
           vmImage: $(OSVmImage)
