@@ -28,9 +28,10 @@ function CreateDisplayName([string]$parameter, [Hashtable]$displayNamesLookup)
 
 function GenerateMatrix(
     [MatrixConfig]$config,
-    [string]$selectFromMatrixType,
-    [string]$displayNameFilter = ".*",
-    [array]$filters = @()
+    [String]$selectFromMatrixType,
+    [String]$displayNameFilter = ".*",
+    [Array]$filters = @(),
+    [Array]$nonSparseParameters = @()
 ) {
     if ($selectFromMatrixType -eq "sparse") {
         [Array]$matrix = GenerateSparseMatrix $config.orderedMatrix $config.displayNamesLookup
@@ -58,26 +59,26 @@ function GenerateMatrix(
     return $matrix
 }
 
-function ProcessAllOf([System.Collections.Specialized.OrderedDictionary]$parameters, [Boolean]$sparse)
-{
-    $parameters = CloneOrderedDictionary $parameters
-    if (-not $parameters.Contains($ALL_OF_KEYWORD)) {
+function ProcessNonSparseParameters(
+    [System.Collections.Specialized.OrderedDictionary]$parameters,
+    [Array]$nonSparseParameters
+) {
+    if (-not $nonSparseParameters) {
         return $parameters, $null
     }
 
-    $allOf = [ordered]@{}
-    foreach ($param in $parameters[$ALL_OF_KEYWORD].PSObject.Properties) {
-        if (-not $sparse) {
-            # If the selection is all, then the allOf field is redundant,
-            # so copy its parameters to the top level
-            $parameters[$param.Name] = $param.Value
+    $parameters = CloneOrderedDictionary $parameters
+    $nonSparse = [ordered]@{}
+
+    $parameters = $parameters | ForEach-Object {
+        if ($_.Name in $nonSparseParameters) {
+            $nonSparse[$_.Name] = $_.Value
+        } else {
+            return $_
         }
-        $allOf.Add($param.Name, $param.Value)
     }
 
-    $parameters.Remove($ALL_OF_KEYWORD)
-
-    return $parameters, $allOf
+    return $parameters, $nonSparse
 }
 
 function FilterMatrixDisplayName([array]$matrix, [string]$filter) {
@@ -289,9 +290,10 @@ function SerializePipelineMatrix([Array]$matrix)
 
 function GenerateSparseMatrix(
     [System.Collections.Specialized.OrderedDictionary]$parameters,
-    [Hashtable]$displayNamesLookup
+    [Hashtable]$displayNamesLookup,
+    [Array]$nonSparseParameters = @()
 ) {
-    $parameters, $allOfParameters = ProcessAllOf $parameters $true
+    $parameters, $nonSparse = ProcessNonSparseParameters $parameters $nonSparseParameters
     [Array]$dimensions = GetMatrixDimensions $parameters
     [Array]$matrix = GenerateFullMatrix $parameters $displayNamesLookup
 
@@ -301,8 +303,8 @@ function GenerateSparseMatrix(
         $sparseMatrix += GetNdMatrixElement $idx $matrix $dimensions
     }
 
-    if ($allOfParameters) {
-        [Array]$allOfMatrix = GenerateFullMatrix $allOfParameters $displayNamesLookup
+    if ($nonSparse) {
+        [Array]$allOfMatrix = GenerateFullMatrix $nonSparse $displayNamesLookup
         return CombineMatrices $allOfMatrix $sparseMatrix
     }
 
@@ -340,7 +342,6 @@ function GenerateFullMatrix(
         return @()
     }
 
-    $parameters, $_ = ProcessAllOf $parameters $false
     $parameterArray = $parameters.GetEnumerator() | ForEach-Object { $_ }
 
     $matrix = [System.Collections.ArrayList]::new()
