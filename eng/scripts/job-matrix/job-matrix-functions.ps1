@@ -34,7 +34,7 @@ function GenerateMatrix(
     [Array]$nonSparseParameters = @()
 ) {
     if ($selectFromMatrixType -eq "sparse") {
-        [Array]$matrix = GenerateSparseMatrix $config.orderedMatrix $config.displayNamesLookup
+        [Array]$matrix = GenerateSparseMatrix $config.orderedMatrix $config.displayNamesLookup $nonSparseParameters
     } elseif ($selectFromMatrixType -eq "all") {
         [Array]$matrix = GenerateFullMatrix $config.orderedMatrix $config.displayNamesLookup
     } else {
@@ -67,18 +67,18 @@ function ProcessNonSparseParameters(
         return $parameters, $null
     }
 
-    $parameters = CloneOrderedDictionary $parameters
+    $sparse = [ordered]@{}
     $nonSparse = [ordered]@{}
 
-    $parameters = $parameters | ForEach-Object {
-        if ($_.Name in $nonSparseParameters) {
-            $nonSparse[$_.Name] = $_.Value
+    foreach ($param in $parameters.GetEnumerator()) {
+        if ($param.Name -in $nonSparseParameters) {
+            $nonSparse[$param.Name] = $param.Value
         } else {
-            return $_
+            $sparse[$param.Name] = $param.Value
         }
     }
 
-    return $parameters, $nonSparse
+    return $sparse, $nonSparse
 }
 
 function FilterMatrixDisplayName([array]$matrix, [string]$filter) {
