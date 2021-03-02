@@ -95,7 +95,14 @@ class DocumentTranslationClient(object):
         :return: JobStatusDetail
         :rtype: JobStatusDetail
         """
-        pass
+        import time
+        while True: # busy waiting (for now)
+            job_details = self.get_job_status(job_id)
+            if job_details.status  not in ["Succeeded", "Failed", "ValidationFailed"]:
+                time.sleep(10)
+                continue
+            return job_details
+
 
     @distributed_trace
     def list_submitted_jobs(self, **kwargs):
