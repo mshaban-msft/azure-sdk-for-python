@@ -75,15 +75,15 @@ class DocumentTranslationClient(object):
 
     @distributed_trace
     def cancel_job(self, job_id, **kwargs):
-        # type: (str, **Any) -> None
+        # type: (str, **Any) -> JobStatusDetail
         """
 
         :param job_id: guid id for job
         :type job_id: str
-        :rtype: None
+        :rtype: JobStatusDetail
         """
 
-        self._client.document_translation.cancel_operation(job_id, **kwargs)
+        return self._client.document_translation.cancel_operation(job_id, **kwargs)
 
     @distributed_trace
     def wait_until_done(self, job_id, **kwargs):
