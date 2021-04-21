@@ -243,11 +243,22 @@ class DocumentTranslationClient(object):  # pylint: disable=r0205
         )
 
     @distributed_trace
-    def list_all_document_statuses(self, job_id, **kwargs):
-        # type: (str, **Any) -> ItemPaged[DocumentStatusResult]
+    def list_all_document_statuses(
+        self,
+        job_id,
+        paging_options=None,
+        filter_options=None,
+        order_by=None,
+        **kwargs
+    ):
+        # type: (str, PagingOptions, FilterOptions, str, **Any) -> ItemPaged[DocumentStatusResult]
         """List all the document statuses under a translation job.
 
         :param str job_id: The translation job ID.
+        :param paing_options: segment result into pages (skip, top, and maxpagesize).
+        :type inputs: List[~azure.ai.translation.document.PagingOptions]
+        :param filter_options: apply filters to result (document ids, document status, doc creation time (start, and end)).
+        :type inputs: List[~azure.ai.translation.document.FilterOptions]
         :return: ~azure.core.paging.ItemPaged[:class:`~azure.ai.translation.document.DocumentStatusResult`]
         :rtype: ~azure.core.paging.ItemPaged
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -272,8 +283,20 @@ class DocumentTranslationClient(object):  # pylint: disable=r0205
             ])
 
         return self._client.document_translation.get_operation_documents_status(
+            # required
             id=job_id,
             cls=model_conversion_function,
+            # paging
+            skip=paging_options.skip if paging_options else 0,
+            top=paging_options.top if paging_options else None,
+            maxpagesize=paging_options.maxpagesize if paging_options else 50,
+            # filters
+            statuses=filter_options.statuses if filter_options else None,
+            ids=filter_options.ids if filter_options else None,
+            created_date_time_utc_start=filter_options.created_date_time_utc_start if filter_options else None,
+            created_date_time_utc_end=filter_options.created_date_time_utc_end if filter_options else None,
+            # ordering
+            order_by=order_by,
             **kwargs
         )
 

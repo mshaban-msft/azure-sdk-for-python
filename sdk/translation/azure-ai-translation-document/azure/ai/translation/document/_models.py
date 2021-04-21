@@ -477,3 +477,49 @@ class FileFormat(object):  # pylint: disable=useless-object-inheritance, R0903
             "content_types={}, format_versions={}, default_format_version={}" \
             .format(self.file_format, self.file_extensions, self.content_types,
                 self.format_versions, self.default_format_version)[:1024]
+
+
+class PagingOptions(object):  # pylint: disable=useless-object-inheritance, R0903
+    """This class models pagination options for listing statuses (jobs and documents).
+
+    :ivar int skip: How many records to skip from the beginning when returning result.
+    :ivar int top: Limit how many records to fetch in the result.
+    :ivar int maxpagesize: ??????????.
+    """
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        # type: (**Any) -> None
+        self.skip = kwargs.get('skip', 0)
+        self.top = kwargs.get('top', None)
+        self.maxpagesize = kwargs.get('maxpagesize', 50)
+
+    def __repr__(self):
+        return "PagingOptions(skip={}, top={}, maxpagesize={}" \
+            .format(self.skip, self.top, self.maxpagesize)[:1024]
+
+
+class FilterOptions(object):  # pylint: disable=useless-object-inheritance, R0903
+    """This class models filtering options for listing statuses (jobs and documents).
+
+    :ivar list[str] statuses: filter by statuses given in this list.
+    :ivar list[str] ids: filter by ids given in this list.
+    :ivar str created_date_time_utc_start: filter result starting from 'created time date'.
+    :ivar str created_date_time_utc_end: filter result ending at 'end time date'.
+    """
+
+    def __init__(
+        self,
+        **kwargs
+    ):
+        # type: (**Any) -> None
+        self.statuses = kwargs.get('statuses', None)
+        self.ids = kwargs.get('ids', None)
+        self.created_date_time_utc_start = kwargs.get('created_date_time_utc_start', None)
+        self.created_date_time_utc_end = kwargs.get('created_date_time_utc_end', None)
+
+    def __repr__(self):
+        return "FilterOptions(statuses={}, ids={}, created_date_time_utc_start={}, created_date_time_utc_end={}" \
+            .format(self.statuses, self.ids, self.created_date_time_utc_start, self.created_date_time_utc_end)[:1024]
