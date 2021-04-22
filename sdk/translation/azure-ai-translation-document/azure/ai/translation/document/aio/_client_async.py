@@ -211,10 +211,21 @@ class DocumentTranslationClient(object):
         return await poller.result()
 
     @distributed_trace
-    def list_submitted_jobs(self, **kwargs):
+    def list_submitted_jobs(
+        self,
+        paging_options=None,
+        filter_options=None,
+        order_by=None,
+        **kwargs):
         # type: (**Any) -> AsyncItemPaged[JobStatusResult]
         """List all the submitted translation jobs under the Document Translation resource.
 
+        :param paing_options: segment result into pages (skip, top, and maxpagesize).
+        :type paing_options: List[~azure.ai.translation.document.PagingOptions]
+        :param filter_options: apply filters to result (document ids, document status, doc creation time (start, and end)).
+        :type filter_options: List[~azure.ai.translation.document.FilterOptions]
+        :param order_by: order result by given fields.
+        :type order_by: List[str]
         :return: ~azure.core.paging.AsyncItemPaged[:class:`~azure.ai.translation.document.JobStatusResult`]
         :rtype: ~azure.core.paging.AsyncItemPaged
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -240,15 +251,39 @@ class DocumentTranslationClient(object):
 
         return self._client.document_translation.get_operations(
             cls=model_conversion_function,
+            # paging
+            skip=paging_options.skip if paging_options else 0,
+            top=paging_options.top if paging_options else None,
+            maxpagesize=paging_options.maxpagesize if paging_options else 50,
+            # filters
+            statuses=filter_options.statuses if filter_options else None,
+            ids=filter_options.ids if filter_options else None,
+            created_date_time_utc_start=filter_options.created_date_time_utc_start if filter_options else None,
+            created_date_time_utc_end=filter_options.created_date_time_utc_end if filter_options else None,
+            # ordering
+            order_by=order_by,
             **kwargs
         )
 
     @distributed_trace
-    def list_all_document_statuses(self, job_id, **kwargs):
+    def list_all_document_statuses(
+        self,
+        job_id,
+        paging_options=None,
+        filter_options=None,
+        order_by=None,
+        **kwargs
+    ):
         # type: (str, **Any) -> AsyncItemPaged[DocumentStatusResult]
         """List all the document statuses under a translation job.
 
         :param str job_id: The translation job ID.
+        :param paing_options: segment result into pages (skip, top, and maxpagesize).
+        :type paing_options: List[~azure.ai.translation.document.PagingOptions]
+        :param filter_options: apply filters to result (document ids, document status, doc creation time (start, and end)).
+        :type filter_options: List[~azure.ai.translation.document.FilterOptions]
+        :param order_by: order result by given fields.
+        :type order_by: List[str]
         :return: ~azure.core.paging.AsyncItemPaged[:class:`~azure.ai.translation.document.DocumentStatusResult`]
         :rtype: ~azure.core.paging.AsyncItemPaged
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -275,6 +310,17 @@ class DocumentTranslationClient(object):
         return self._client.document_translation.get_operation_documents_status(
             id=job_id,
             cls=model_conversion_function,
+            # paging
+            skip=paging_options.skip if paging_options else 0,
+            top=paging_options.top if paging_options else None,
+            maxpagesize=paging_options.maxpagesize if paging_options else 50,
+            # filters
+            statuses=filter_options.statuses if filter_options else None,
+            ids=filter_options.ids if filter_options else None,
+            created_date_time_utc_start=filter_options.created_date_time_utc_start if filter_options else None,
+            created_date_time_utc_end=filter_options.created_date_time_utc_end if filter_options else None,
+            # ordering
+            order_by=order_by,
             **kwargs
         )
 
