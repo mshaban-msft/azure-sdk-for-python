@@ -214,7 +214,7 @@ class DocumentTranslationClient(object):
 
     @distributed_trace
     def list_submitted_jobs(self, **kwargs):
-        # type: (**Any) -> AsyncItemPaged[JobStatusResult]
+        # type: ignore
         """List all the submitted translation jobs under the Document Translation resource.
 
         :keyword int top: the total number of jobs to return (across all pages) from all submitted jobs.
@@ -269,7 +269,7 @@ class DocumentTranslationClient(object):
 
     @distributed_trace
     def list_all_document_statuses(self, job_id, **kwargs):
-        # type: (str, **Any) -> AsyncItemPaged[DocumentStatusResult]
+        # type: ignore
         """List all the document statuses for a given translation job.
 
         :param str job_id: ID of translation job to list documents for.

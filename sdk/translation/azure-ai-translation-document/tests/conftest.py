@@ -7,8 +7,9 @@
 # --------------------------------------------------------------------------
 
 import sys
+from typing import List
 
 # Ignore async tests for Python < 3.5
-collect_ignore_glob = []
+collect_ignore_glob = [] # type: List[str]
 if sys.version_info < (3, 5):
     collect_ignore_glob.append("*_async.py")

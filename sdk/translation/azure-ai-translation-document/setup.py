@@ -14,7 +14,7 @@ namespace_name = PACKAGE_NAME.replace('-', '.')
 # Version extraction inspired from 'requests'
 with open(os.path.join(package_folder_path, '_version.py'), 'r') as fd:
     version = re.search(r'^VERSION\s*=\s*[\'"]([^\'"]*)[\'"]',
-                        fd.read(), re.MULTILINE).group(1)
+                        fd.read(), re.MULTILINE).group(1) # type: ignore
 if not version:
     raise RuntimeError('Cannot find version information')
 
