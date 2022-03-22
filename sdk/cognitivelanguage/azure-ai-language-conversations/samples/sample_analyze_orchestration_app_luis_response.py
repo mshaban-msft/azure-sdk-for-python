@@ -74,7 +74,7 @@ def sample_analyze_orchestration_app_luis_response():
     print("confidence score: {}".format(top_intent_object.confidence))
     print("project kind: {}".format(top_intent_object.target_kind))
 
-    if isinstance(top_intent_object, LUISTargetIntentResult):
+    if top_intent_object.target_kind == "luis":
         print("\nluis response:")
         luis_response = top_intent_object.result["prediction"]
         print("top intent: {}".format(luis_response["topIntent"]))
