@@ -7,7 +7,7 @@
 # --------------------------------------------------------------------------
 
 from copy import deepcopy
-from typing import Any, Awaitable, TYPE_CHECKING
+from typing import Any, Awaitable
 
 from msrest import Deserializer, Serializer
 
@@ -15,12 +15,9 @@ from azure.core import AsyncPipelineClient
 from azure.core.credentials import AzureKeyCredential
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
+from .. import models
 from ._configuration import ConversationAnalysisClientConfiguration
 from ._operations import ConversationAnalysisClientOperationsMixin
-
-if TYPE_CHECKING:
-    # pylint: disable=unused-import,ungrouped-imports
-    from typing import Dict
 
 class ConversationAnalysisClient(ConversationAnalysisClientOperationsMixin):
     """The language service conversations API is a suite of natural language processing (NLP) skills
@@ -56,8 +53,9 @@ class ConversationAnalysisClient(ConversationAnalysisClientOperationsMixin):
         self._config = ConversationAnalysisClientConfiguration(endpoint=endpoint, credential=credential, **kwargs)
         self._client = AsyncPipelineClient(base_url=_endpoint, config=self._config, **kwargs)
 
-        self._serialize = Serializer()
-        self._deserialize = Deserializer()
+        client_models = {k: v for k, v in models.__dict__.items() if isinstance(v, type)}
+        self._serialize = Serializer(client_models)
+        self._deserialize = Deserializer(client_models)
         self._serialize.client_side_validation = False
 
 

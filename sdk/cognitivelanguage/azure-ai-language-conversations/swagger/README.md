@@ -31,6 +31,7 @@ python: true
 title: ConversationAnalysisClient
 tag: release_2022_05_01_preview
 openapi-type: data-plane
+models-mode: msrest
 version-tolerant: true
 package-version: 1.1.0b1
 add-credential: true
